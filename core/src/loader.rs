@@ -20,7 +20,9 @@ use crate::avm2_stub_method_context;
 use crate::backend::navigator::{
     ErrorResponse, FetchReason, OwnedFuture, Request, SuccessResponse,
 };
-use crate::backend::ui::{DialogResultFuture, FileDialogResult};
+use crate::backend::ui::{
+    DialogResultFuture, FileDialogResult, MultiDialogResultFuture, MultiFileDialogResult,
+};
 use crate::bitmap::bitmap_data::BitmapData;
 use crate::bitmap::bitmap_data::Color;
 use crate::context::{ActionQueue, ActionType, UpdateContext};
@@ -1010,7 +1012,7 @@ pub fn load_form_into_object<'gc>(
             for (k, v) in form_urlencoded::parse(utf8_body) {
                 let k = AvmString::new_utf8(activation.gc(), k);
                 let v = AvmString::new_utf8(activation.gc(), v);
-                that.set(k, v.into(), &mut activation)?;
+                that.set(k, v, &mut activation)?;
             }
 
             // Fire the onData method and event.
@@ -2352,6 +2354,19 @@ fn run_file_dialog<D: 'static>(
     })
 }
 
+fn broadcast_avm1_file_event<'gc>(
+    target: Object<'gc>,
+    event: AvmString<'gc>,
+    activation: &mut Activation<'_, 'gc>,
+) -> Result<bool, crate::avm1::Error<'gc>> {
+    crate::avm1::globals::as_broadcaster::broadcast_internal(
+        target,
+        &[target.into()],
+        event,
+        activation,
+    )
+}
+
 /// Display a dialog allowing a user to select a file from an AVM1 scope.
 ///
 /// Returns a future that will be resolved when a file is selected.
@@ -2375,25 +2390,54 @@ pub fn select_file_dialog_avm1<'gc>(
 
         match dialog_result {
             Ok(FileDialogResult::Selection(selection)) => {
-                use crate::avm1::globals::as_broadcaster;
-
                 file_ref.init_from_file_selection(&mut activation, &*selection);
-                as_broadcaster::broadcast_internal(
-                    target_object,
-                    &[target_object.into()],
-                    istr!("onSelect"),
-                    &mut activation,
-                )?;
+                broadcast_avm1_file_event(target_object, istr!("onSelect"), &mut activation)?;
             }
             Ok(FileDialogResult::Canceled) => {
-                use crate::avm1::globals::as_broadcaster;
+                broadcast_avm1_file_event(target_object, istr!("onCancel"), &mut activation)?;
+            }
+            Err(err) => {
+                tracing::warn!("Error on file dialog: {:?}", err);
+            }
+        }
 
-                as_broadcaster::broadcast_internal(
-                    target_object,
-                    &[target_object.into()],
-                    istr!("onCancel"),
+        Ok(())
+    })
+}
+
+/// Display a multi-file selection dialog from an AVM1 scope (`FileReferenceList.browse`).
+///
+/// Returns a future that will be resolved when files are selected or the dialog is canceled.
+#[must_use]
+pub fn select_multi_file_dialog_avm1<'gc>(
+    uc: &UpdateContext<'gc>,
+    target_object: Object<'gc>,
+    dialog: MultiDialogResultFuture,
+) -> OwnedFuture<(), Error> {
+    let handle = ObjectHandle::stash(uc, target_object);
+
+    run_file_dialog(uc, dialog, move |uc, dialog_result| {
+        let target_object = handle.fetch(uc);
+
+        let mut activation = Activation::from_stub(uc, ActivationIdentifier::root("[File Dialog]"));
+
+        match dialog_result {
+            Ok(MultiFileDialogResult::Selection(selections)) => {
+                let file_list = crate::avm1::globals::file_reference_list::build_file_list(
                     &mut activation,
-                )?;
+                    &selections,
+                );
+                target_object.define_value(
+                    activation.gc(),
+                    istr!("fileList"),
+                    file_list.into(),
+                    Attribute::DONT_ENUM | Attribute::DONT_DELETE | Attribute::READ_ONLY,
+                );
+
+                broadcast_avm1_file_event(target_object, istr!("onSelect"), &mut activation)?;
+            }
+            Ok(MultiFileDialogResult::Canceled) => {
+                broadcast_avm1_file_event(target_object, istr!("onCancel"), &mut activation)?;
             }
             Err(err) => {
                 tracing::warn!("Error on file dialog: {:?}", err);
