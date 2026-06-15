@@ -14,7 +14,7 @@ This should be set to the version of Ruffle that this MSI contains.
 The format should either be `1.2.3` or `1.2.3.4` - however the fourth value is IGNORED by Windows for "is it the same version or newer" checks.
 
 ### `CARGO_BUILD_DIR` (optional)
-This should be set to the folder that contains `ruffle_desktop`. The default value is `../../../../target/release`.
+This should be set to the folder that contains `ruffle_desktop`. The default value is [`../../../../target/release/`](../../../../target/release/)
 
 # Build
 In this directory, run: `wix build ruffle.wxs -ext WixToolset.UI.wixext -ext WixToolset.Util.wixext -arch x64`
@@ -25,7 +25,7 @@ Add `-pdbtype none` to disable generation of the `.wixpdb` if you wish.
 
 Add `-o foo.msi` to control where the MSI is placed.
 
-[@fancy2209](https://github.com/fancy2209/)'s epic build code:
+[**@fancy2209**](https://github.com/fancy2209/)'s epic build code:
 `cargo build --release --features steamworks`
 
-Inject desktop flash metadata here: [./desktop/assets/ruffle_desktop.rc](../../../assets/ruffle_desktop.rc)
+Inject desktop flash metadata here: [`./desktop/assets/ruffle_desktop.rc`](../../../assets/ruffle_desktop.rc)
