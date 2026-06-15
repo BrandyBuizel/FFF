@@ -371,7 +371,7 @@ jobs:
           toolchain: stable
 
       - name: Generate report
-        run: ./stub-report/generate-report.sh
+        run: cargo run --locked --package stub-report -- --avm2-report avm2_report.json
 
       - name: Upload report
         run: gh release upload "${{ needs.create-release.outputs.tag_name }}" avm2_report.json
@@ -415,7 +415,7 @@ jobs:
       # Be sure to update in test_web.yml, Cargo.toml, web/docker/Dockerfile,
       # and web/README.md as well.
       - name: Install wasm-bindgen
-        run: cargo install wasm-bindgen-cli --version 0.2.120
+        run: cargo install --locked wasm-bindgen-cli --version 0.2.120
 
       # Keep the version number in sync in all workflows,
       # and in the extension builder Dockerfile!
@@ -496,7 +496,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish Chrome extension
-        if: env.CHROME_EXTENSION_ID != '' && needs.create-release.outputs.release_channel == 'nightly'
+        if: env.CHROME_EXTENSION_ID != '' && needs.create-release.outputs.release_channel == 'stable'
         id: publish-chrome-extension
         continue-on-error: true
         env:
@@ -510,7 +510,7 @@ jobs:
           file-path: ./web/packages/extension/dist/ruffle_extension.zip
 
       - name: Publish Edge extension
-        if: env.EDGE_PRODUCT_ID != '' && needs.create-release.outputs.release_channel == 'nightly'
+        if: env.EDGE_PRODUCT_ID != '' && needs.create-release.outputs.release_channel == 'stable'
         id: publish-edge-extension
         continue-on-error: true
         env:
@@ -523,7 +523,7 @@ jobs:
           api-key: ${{ secrets.EDGE_API_KEY }}
 
       - name: Publish Firefox extension
-        if: env.FIREFOX_EXTENSION_ID != '' && needs.create-release.outputs.release_channel == 'nightly'
+        if: env.FIREFOX_EXTENSION_ID != '' && needs.create-release.outputs.release_channel == 'stable'
         id: publish-firefox-extension
         continue-on-error: true
         env:
