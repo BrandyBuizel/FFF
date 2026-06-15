@@ -38,8 +38,8 @@ Object was constructed
 Testing removeListener()
 Testing addListener()
 Testing broadcastMessage()
-Testing getProgress()
 Testing unloadClip()
+Testing getProgress()
 Testing loadClip()
 Testing constructor()
 Testing _listeners()
@@ -119,6 +119,11 @@ testing _global.flash.net(object)
 testing _global.flash.net.FileReferenceList(function)
 Trying to construct _global.flash.net.FileReferenceList
 Object was constructed
+Testing _listeners()
+Testing removeListener()
+Testing addListener()
+Testing broadcastMessage()
+Testing browse()
 Testing constructor()
 Testing __constructor__()
 testing _global.flash.net.FileReferenceList.__constructor__(undefined)
@@ -588,6 +593,9 @@ Testing __constructor__()
 Testing __proto__()
 testing _global.System.useCodepage(boolean)
 testing _global.System.exactSettings(boolean)
+testing _global.SoundCodec(object)
+testing _global.SoundCodec.NELLYMOSER(string)
+testing _global.SoundCodec.SPEEX(string)
 testing _global.Accessibility(object)
 testing _global.Accessibility.updateProperties(function)
 Trying to construct _global.Accessibility.updateProperties
@@ -810,6 +818,21 @@ Testing __constructor__()
 testing _global.Key.broadcastMessage.__constructor__(undefined)
 Testing __proto__()
 testing _global.Mouse(object)
+testing _global.Mouse.setTrailerMode(function)
+Trying to construct _global.Mouse.setTrailerMode
+Object was constructed
+Testing __constructor__()
+Testing __proto__()
+testing _global.Mouse.setTrailerPosition(function)
+Trying to construct _global.Mouse.setTrailerPosition
+Object was constructed
+Testing __constructor__()
+Testing __proto__()
+testing _global.Mouse.setTrailer(function)
+Trying to construct _global.Mouse.setTrailer
+Object was constructed
+Testing __constructor__()
+Testing __proto__()
 testing _global.Mouse.hide(function)
 Trying to construct _global.Mouse.hide
 Object was constructed
@@ -1317,6 +1340,27 @@ testing _global.ASSetPropFlags(function)
 Trying to construct _global.ASSetPropFlags
 Object was constructed
 Testing __constructor__()
+Testing __proto__()
+testing _global.RemoteLSOUsage(function)
+Trying to construct _global.RemoteLSOUsage
+Object was constructed
+Testing constructor()
+Testing __constructor__()
+testing _global.RemoteLSOUsage.__constructor__(undefined)
+Testing __proto__()
+testing _global.AssetCache(function)
+Trying to construct _global.AssetCache
+Object was constructed
+Testing constructor()
+Testing __constructor__()
+testing _global.AssetCache.__constructor__(undefined)
+Testing __proto__()
+testing _global.AsSetupError(function)
+Trying to construct _global.AsSetupError
+Object was constructed
+Testing constructor()
+Testing __constructor__()
+testing _global.AsSetupError.__constructor__(undefined)
 Testing __proto__()
 testing _global.Error(function)
 Trying to construct _global.Error
