@@ -4,6 +4,7 @@ package ruffle.steamworks {
     import flash.external.ExternalInterface;
 
     import ruffle.steamworks.Achievement;
+    import ruffle.steamworks.Leaderboard;
     import ruffle.steamworks.LocalPlayer;
     import ruffle.steamworks.Utils;
 
@@ -41,6 +42,12 @@ package ruffle.steamworks {
             }
             return _achievement;
         }
+        public function get leaderboard(): Leaderboard {
+            if (!_leaderboard) {
+                _leaderboard = new Leaderboard(this);
+            }
+            return _leaderboard;
+        }
 
         internal function call(name: String, ...args: *): * {
             return ExternalInterface.call.apply(null, ["steamworks." + name].concat(args));
@@ -49,5 +56,6 @@ package ruffle.steamworks {
         private var _utils: Utils;
         private var _localPlayer: LocalPlayer;
         private var _achievement: Achievement;
+        private var _leaderboard: Leaderboard;
     }
 }
