@@ -3,11 +3,11 @@ use crate::gui::{GuiController, MENU_HEIGHT};
 use crate::player::{LaunchOptions, PlayerController};
 use crate::preferences::GlobalPreferences;
 use crate::util::{
-    get_screen_size, gilrs_button_to_gamepad_button, plot_stats_in_tracy,
+    get_screen_size/*, gilrs_button_to_gamepad_button*/, plot_stats_in_tracy,
     winit_input_to_ruffle_key_descriptor, winit_to_ruffle_text_control,
 };
 use anyhow::Error;
-use gilrs::{Event, EventType, Gilrs};
+//use gilrs::{Event, EventType, Gilrs};
 use ruffle_core::FloatDuration;
 use ruffle_core::PlayerEvent;
 use ruffle_core::events::{ImeEvent, ImeNotification, PlayerNotification};
@@ -22,6 +22,7 @@ use winit::event::{ElementState, Ime, KeyEvent, Modifiers, StartCause, WindowEve
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop, EventLoopProxy};
 use winit::keyboard::{Key, NamedKey};
 use winit::window::{Fullscreen, Icon, WindowAttributes, WindowId};
+use url::Url;
 
 struct MainWindow {
     preferences: GlobalPreferences,
@@ -81,7 +82,7 @@ impl MainWindow {
                             provider.update(ctx);
                         }
                     });
-                    
+
                     let viewport_scale_factor = self.gui.window().scale_factor();
                     player.set_viewport_dimensions(ViewportDimensions {
                         width: size.width,
@@ -355,8 +356,8 @@ impl MainWindow {
         }
     }
 
-    fn about_to_wait(&mut self, gilrs: Option<&mut Gilrs>) {
-        if let Some(Event { event, .. }) = gilrs.and_then(|gilrs| gilrs.next_event()) {
+    fn about_to_wait(&mut self/*, gilrs: Option<&mut Gilrs>*/) {
+        /*if let Some(Event { event, .. }) = gilrs.and_then(|gilrs| gilrs.next_event()) {
             match event {
                 EventType::ButtonPressed(button, _) => {
                     if let Some(button) = gilrs_button_to_gamepad_button(button) {
@@ -374,7 +375,7 @@ impl MainWindow {
                 }
                 _ => {}
             }
-        }
+        }*/
 
         // Core loop
         // [NA] This used to be called `MainEventsCleared`, but I think the behaviour is different now.
@@ -404,7 +405,7 @@ impl MainWindow {
 pub struct App {
     main_window: Option<MainWindow>,
     runtime: Option<tokio::runtime::Runtime>,
-    gilrs: Option<Gilrs>,
+    //gilrs: Option<Gilrs>,
     event_loop_proxy: EventLoopProxy<RuffleEvent>,
     preferences: GlobalPreferences,
     font_database: fontdb::Database,
@@ -425,11 +426,11 @@ impl App {
         let mut font_database = fontdb::Database::default();
         font_database.load_system_fonts();
 
-        let gilrs = Gilrs::new()
-            .inspect_err(|err| {
-                tracing::warn!("Gamepad support could not be initialized: {err}");
-            })
-            .ok();
+        //let gilrs = Gilrs::new()
+        //    .inspect_err(|err| {
+        //        tracing::warn!("Gamepad support could not be initialized: {err}");
+        //    })
+        //    .ok();
         let event_loop_proxy = event_loop.create_proxy();
         let runtime = tokio::runtime::Runtime::new()?;
 
@@ -437,7 +438,7 @@ impl App {
             Self {
                 main_window: None,
                 runtime: Some(runtime),
-                gilrs,
+                //gilrs,
                 event_loop_proxy,
                 font_database,
                 preferences,
@@ -503,6 +504,7 @@ impl ApplicationHandler<RuffleEvent> for App {
             let window = event_loop
                 .create_window(window_attributes)
                 .expect("Window should be created");
+            
             let max_window_size = get_screen_size(&window);
             window.set_max_inner_size(Some(max_window_size));
             let window = Arc::new(window);
@@ -696,7 +698,7 @@ impl ApplicationHandler<RuffleEvent> for App {
         enter_runtime!(self);
 
         if let Some(main_window) = &mut self.main_window {
-            main_window.about_to_wait(self.gilrs.as_mut());
+            main_window.about_to_wait(/*self.gilrs.as_mut()*/);
 
             // The event loop is finished; let's find out how long we need to wait for.
             // We don't need to worry about earlier update requests, as it's the
